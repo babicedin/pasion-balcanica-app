@@ -1,0 +1,164 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 247 247 248;
+  --surface: 255 255 255;
+  --foreground: 17 17 19;
+  --foreground-muted: 107 114 128;
+  --border: 17 17 19;
+  --brand-purple: 81 46 136;
+  --brand-red: 178 32 39;
+}
+
+* {
+  border-color: rgb(var(--border) / 0.08);
+}
+
+html,
+body {
+  color: rgb(var(--foreground));
+  background: rgb(var(--background));
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgb(var(--brand-purple) / 0.15);
+  color: rgb(var(--foreground));
+}
+
+/* Native-feeling scrollbars (WebKit) */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--border) / 0.18);
+  border-radius: 9999px;
+  border: 2px solid rgb(var(--background));
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--border) / 0.28);
+}
+
+@layer components {
+  /* Surfaces */
+  .card {
+    @apply bg-white border border-line rounded-2xl shadow-soft;
+  }
+  .card-hover {
+    @apply transition-all duration-200 ease-apple-out hover:shadow-card hover:-translate-y-[1px];
+  }
+  .surface-muted {
+    @apply bg-surface-muted;
+  }
+
+  /* Typography */
+  .h-display {
+    @apply text-3xl md:text-4xl font-semibold tracking-tightish text-brand-ink;
+  }
+  .h-title {
+    @apply text-2xl font-semibold tracking-tightish text-brand-ink;
+  }
+  .h-section {
+    @apply text-sm font-medium text-neutral-500 uppercase tracking-[0.08em];
+  }
+  .text-muted {
+    @apply text-neutral-500;
+  }
+
+  /* Buttons */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-medium
+           transition-all duration-200 ease-apple-out select-none
+           focus:outline-none focus-visible:ring-4 focus-visible:ring-brand-purple/20
+           disabled:opacity-60 disabled:pointer-events-none;
+  }
+  .btn-primary {
+    @apply btn bg-brand-ink text-white hover:bg-black active:bg-black shadow-soft;
+  }
+  .btn-accent {
+    @apply btn bg-brand-purple text-white hover:brightness-110 active:brightness-95 shadow-soft;
+  }
+  .btn-gradient {
+    @apply btn bg-brand-gradient text-white hover:brightness-105 active:brightness-95 shadow-soft;
+  }
+  .btn-secondary {
+    @apply btn bg-white border border-line text-brand-ink hover:bg-surface-muted;
+  }
+  .btn-ghost {
+    @apply btn bg-transparent text-neutral-700 hover:bg-surface-muted;
+  }
+  .btn-danger-ghost {
+    @apply btn bg-transparent text-brand-red hover:bg-brand-red/10;
+  }
+
+  /* Inputs */
+  .input {
+    @apply w-full px-3.5 py-2.5 rounded-xl bg-white border border-line text-brand-ink
+           placeholder:text-neutral-400
+           focus:outline-none focus:border-brand-purple/40 focus:ring-4 focus:ring-brand-purple/15
+           transition-all duration-200 ease-apple-out;
+  }
+  .label {
+    @apply block text-xs font-medium text-neutral-600 mb-1.5;
+  }
+
+  /* Badges */
+  .badge {
+    @apply inline-flex items-center gap-1 text-2xs font-medium px-2 py-0.5 rounded-full
+           border border-line bg-surface-muted text-neutral-600;
+  }
+  .badge-success {
+    @apply badge bg-emerald-50 text-emerald-700 border-emerald-100;
+  }
+  .badge-muted {
+    @apply badge bg-surface-muted text-neutral-500 border-line;
+  }
+  .badge-accent {
+    @apply badge bg-brand-purple/10 text-brand-purple border-brand-purple/20;
+  }
+
+  /* Tables */
+  .data-table {
+    @apply w-full text-sm;
+  }
+  .data-table thead {
+    @apply bg-surface-muted/60;
+  }
+  .data-table th {
+    @apply text-left py-3 px-4 text-2xs font-medium uppercase tracking-[0.06em] text-neutral-500;
+  }
+  .data-table tbody tr {
+    @apply border-t border-line transition-colors hover:bg-surface-muted/70;
+  }
+  .data-table td {
+    @apply py-3.5 px-4 text-neutral-800;
+  }
+
+  /* Navigation */
+  .nav-link {
+    @apply relative flex items-center gap-3 px-3 py-2 rounded-xl text-sm
+           text-neutral-600 hover:text-brand-ink hover:bg-surface-muted
+           transition-colors duration-200 ease-apple-out;
+  }
+  .nav-link[data-active="true"] {
+    @apply bg-surface-muted text-brand-ink font-medium;
+  }
+  .nav-link[data-active="true"]::before {
+    content: "";
+    @apply absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full bg-brand-gradient;
+  }
+
+  /* Aurora/hero backgrounds for login, etc. */
+  .hero-bg {
+    @apply relative bg-surface-muted;
+  }
+  .hero-bg::before {
+    content: "";
+    @apply absolute inset-0 bg-hero-aurora pointer-events-none;
+  }
+}

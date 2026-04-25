@@ -1,0 +1,55 @@
+name: pasion_balcanica
+description: Pasión Balcánica — walking tours in Sarajevo.
+publish_to: "none"
+version: 0.2.0+1
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+  flutter: ">=3.19.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State
+  flutter_riverpod: ^2.5.1
+
+  # Backend
+  supabase_flutter: ^2.8.0
+
+  # Config
+  flutter_dotenv: ^5.1.0
+
+  # UI
+  cached_network_image: ^3.4.1
+  google_fonts: ^6.2.1
+
+  # Utilities
+  url_launcher: ^6.3.1
+  shared_preferences: ^2.3.2
+  share_plus: ^10.1.4
+
+dev_dependencies:
+  flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.14.1
+  flutter_test:
+    sdk: flutter
+
+# App launcher icon generation. Run after changing `image_path`:
+#   dart run flutter_launcher_icons
+flutter_launcher_icons:
+  android: "ic_launcher"
+  ios: false
+  image_path: "assets/app_icon.png"
+  remove_alpha_ios: true
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/app_icon.png"
+  min_sdk_android: 21
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - .env
+    - assets/logo.png
+    - assets/app_icon.png
