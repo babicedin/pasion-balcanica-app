@@ -265,24 +265,42 @@ function EditFoodSpotForm({
             lang="en"
             required
           />
-          <label className="inline-flex items-center gap-2 text-sm text-neutral-700">
-            <input
-              type="checkbox"
-              checked={isPublished}
-              onChange={(e) => setIsPublished(e.target.checked)}
-              className="h-4 w-4 rounded border-line text-brand-purple focus:ring-brand-purple/30"
-            />
-            Published
-          </label>
-          <label className="inline-flex items-center gap-2 text-sm text-neutral-700">
-            <input
-              type="checkbox"
-              checked={isHomeTaste}
-              onChange={(e) => setIsHomeTaste(e.target.checked)}
-              className="h-4 w-4 rounded border-line text-brand-purple focus:ring-brand-purple/30"
-            />
-            A taste of Sarajevo (home section)
-          </label>
+          <div>
+            <p className="text-sm font-medium text-brand-ink">Visibility & home curation</p>
+            <p className="text-xs text-muted mt-1">
+              Pick whether this spot is visible and featured on the home screen.
+            </p>
+          </div>
+          <div className="space-y-2">
+            <label className="flex items-start gap-3 rounded-xl border border-line/70 bg-brand-paper px-3 py-2.5 text-sm text-neutral-700 hover:border-brand-purple/30 transition-colors">
+              <input
+                type="checkbox"
+                checked={isPublished}
+                onChange={(e) => setIsPublished(e.target.checked)}
+                className="mt-0.5 h-4 w-4 rounded border-line text-brand-purple focus:ring-brand-purple/30"
+              />
+              <span>
+                <span className="font-medium text-brand-ink">Published</span>
+                <span className="block text-xs text-muted mt-0.5">
+                  Shows this food spot in the mobile app.
+                </span>
+              </span>
+            </label>
+            <label className="flex items-start gap-3 rounded-xl border border-line/70 bg-brand-paper px-3 py-2.5 text-sm text-neutral-700 hover:border-brand-purple/30 transition-colors">
+              <input
+                type="checkbox"
+                checked={isHomeTaste}
+                onChange={(e) => setIsHomeTaste(e.target.checked)}
+                className="mt-0.5 h-4 w-4 rounded border-line text-brand-purple focus:ring-brand-purple/30"
+              />
+              <span>
+                <span className="font-medium text-brand-ink">A taste of Sarajevo section</span>
+                <span className="block text-xs text-muted mt-0.5">
+                  Includes this spot in the home food highlights.
+                </span>
+              </span>
+            </label>
+          </div>
           <p className="text-xs text-muted">
             Order is managed by drag-and-drop on the food list.
           </p>

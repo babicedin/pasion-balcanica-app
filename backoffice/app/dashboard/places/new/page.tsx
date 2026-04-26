@@ -140,35 +140,58 @@ function NewPlaceForm() {
           onYoutubeUrlsChange={setYoutubeUrls}
         />
 
-        <div className="card p-6 md:p-7">
-          <label className="inline-flex items-center gap-2 text-sm text-neutral-700">
-            <input
-              type="checkbox"
-              name="is_published"
-              checked={isPublished}
-              onChange={(e) => setIsPublished(e.target.checked)}
-              className="h-4 w-4 rounded border-line text-brand-purple focus:ring-brand-purple/30"
-            />
-            Published
-          </label>
-          <label className="inline-flex items-center gap-2 text-sm text-neutral-700">
-            <input
-              type="checkbox"
-              checked={isHomePick}
-              onChange={(e) => setIsHomePick(e.target.checked)}
-              className="h-4 w-4 rounded border-line text-brand-purple focus:ring-brand-purple/30"
-            />
-            Today&apos;s pick (home hero badge)
-          </label>
-          <label className="inline-flex items-center gap-2 text-sm text-neutral-700">
-            <input
-              type="checkbox"
-              checked={isHomeMustSee}
-              onChange={(e) => setIsHomeMustSee(e.target.checked)}
-              className="h-4 w-4 rounded border-line text-brand-purple focus:ring-brand-purple/30"
-            />
-            Must-see places (home section)
-          </label>
+        <div className="card p-6 md:p-7 space-y-4">
+          <div>
+            <p className="text-sm font-medium text-brand-ink">Visibility & home curation</p>
+            <p className="text-xs text-muted mt-1">
+              Decide if this place is public and where it appears on the home screen.
+            </p>
+          </div>
+          <div className="space-y-2">
+            <label className="flex items-start gap-3 rounded-xl border border-line/70 bg-brand-paper px-3 py-2.5 text-sm text-neutral-700 hover:border-brand-purple/30 transition-colors">
+              <input
+                type="checkbox"
+                name="is_published"
+                checked={isPublished}
+                onChange={(e) => setIsPublished(e.target.checked)}
+                className="mt-0.5 h-4 w-4 rounded border-line text-brand-purple focus:ring-brand-purple/30"
+              />
+              <span>
+                <span className="font-medium text-brand-ink">Published</span>
+                <span className="block text-xs text-muted mt-0.5">
+                  Shows this place in the app list when enabled.
+                </span>
+              </span>
+            </label>
+            <label className="flex items-start gap-3 rounded-xl border border-line/70 bg-brand-paper px-3 py-2.5 text-sm text-neutral-700 hover:border-brand-purple/30 transition-colors">
+              <input
+                type="checkbox"
+                checked={isHomePick}
+                onChange={(e) => setIsHomePick(e.target.checked)}
+                className="mt-0.5 h-4 w-4 rounded border-line text-brand-purple focus:ring-brand-purple/30"
+              />
+              <span>
+                <span className="font-medium text-brand-ink">Today&apos;s pick badge</span>
+                <span className="block text-xs text-muted mt-0.5">
+                  Allows this place to be used as the home hero (shown as “Our pick”).
+                </span>
+              </span>
+            </label>
+            <label className="flex items-start gap-3 rounded-xl border border-line/70 bg-brand-paper px-3 py-2.5 text-sm text-neutral-700 hover:border-brand-purple/30 transition-colors">
+              <input
+                type="checkbox"
+                checked={isHomeMustSee}
+                onChange={(e) => setIsHomeMustSee(e.target.checked)}
+                className="mt-0.5 h-4 w-4 rounded border-line text-brand-purple focus:ring-brand-purple/30"
+              />
+              <span>
+                <span className="font-medium text-brand-ink">Must-see places section</span>
+                <span className="block text-xs text-muted mt-0.5">
+                  Includes this place in the “Must-see places” home carousel.
+                </span>
+              </span>
+            </label>
+          </div>
           <p className="text-xs text-muted mt-2">
             Order is set by drag-and-drop on the places list. New items are
             appended to the end.
