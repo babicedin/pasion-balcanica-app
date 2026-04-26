@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/providers.dart';
+import '../push.dart';
 import '../theme/palette.dart';
 import '../widgets/nav.dart';
 import 'food_screen.dart';
@@ -20,14 +21,46 @@ import 'shopping_screen.dart';
 /// screen rather than being given to Scaffold.bottomNavigationBar — this
 /// guarantees it hugs the bottom edge, regardless of screen size or
 /// intrinsic-height quirks.
-class HomeShell extends ConsumerWidget {
+class HomeShell extends ConsumerStatefulWidget {
   const HomeShell({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeShell> createState() => _HomeShellState();
+}
+
+class _HomeShellState extends ConsumerState<HomeShell> {
+  bool _pushTapHandlersAttached = false;
+
+  @override
+  Widget build(BuildContext context) {
     final pb = context.pb;
     final activeIndex = ref.watch(activeTabIndexProvider);
     final active = PBTab.values[activeIndex.clamp(0, PBTab.values.length - 1)];
+
+    // One-time: hook FCM tap callbacks into our Riverpod ref so a tap
+    // on a notification can flip the active tab. Idempotent — guarded by
+    // the bool so a rebuild doesn't double-subscribe.
+    if (!_pushTapHandlersAttached) {
+      _pushTapHandlersAttached = true;
+      PushService.instance.attachTapHandlers(ref);
+    }
+
+    // Re-register the device token whenever the user changes language so
+    // future broadcasts arrive in their preferred locale.
+    ref.listen<String>(localeProvider, (prev, next) {
+      if (prev != next) PushService.instance.init(locale: next);
+    });
+
+    // A push tap (or an in-app shortcut) parks an index in the pending
+    // provider; we drain it into the active tab and clear it back to null
+    // so the same tap doesn't keep re-firing on rebuild.
+    ref.listen<int?>(pendingTabRequestProvider, (_, next) {
+      if (next == null) return;
+      ref.read(activeTabIndexProvider.notifier).state = next;
+      Future.microtask(
+        () => ref.read(pendingTabRequestProvider.notifier).state = null,
+      );
+    });
 
     return Scaffold(
       backgroundColor: pb.bg,

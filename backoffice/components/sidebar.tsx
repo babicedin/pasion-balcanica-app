@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
+  Bell,
   Home,
   Info,
   MapPin,
@@ -56,6 +57,11 @@ const contentNavItems: NavItem[] = [
     href: "/dashboard/reviews",
     label: "Reviews",
     icon: <Star size={18} strokeWidth={1.75} />,
+  },
+  {
+    href: "/dashboard/notifications",
+    label: "Notifications",
+    icon: <Bell size={18} strokeWidth={1.75} />,
   },
 ];
 

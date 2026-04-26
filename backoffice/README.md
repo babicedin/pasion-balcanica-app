@@ -27,6 +27,8 @@ GOOGLE_REVIEWS_TARGET=50
 GOOGLE_REVIEWS_HL=en
 GOOGLE_REVIEWS_GL=ba
 REVIEWS_SYNC_SECRET=...      # required for external cron jobs
+CRON_SECRET=...              # required for /api/cron/review-reminders manual auth
+FCM_SERVICE_ACCOUNT_JSON=... # full Firebase service-account JSON, one-line string
 ```
 
 Already populated for local dev.
@@ -50,6 +52,37 @@ curl -X POST https://your-domain.com/api/reviews/sync \
 ```
 
 Run daily (for example, every 24h) and keep the secret server-side only.
+
+## Push notifications
+
+Push is implemented with Firebase Cloud Messaging (FCM):
+
+- Admin broadcast API: `POST /api/notifications/send` (admin session required)
+- Daily review reminder API: `GET /api/cron/review-reminders`
+  - accepts Vercel cron header (`x-vercel-cron`) or
+  - `Authorization: Bearer <CRON_SECRET>` for manual/external triggers
+
+### Required setup
+
+1. In Firebase, create an Android app matching your Flutter package id.
+2. Put `google-services.json` in `mobile/android/app/google-services.json`.
+3. Generate a Firebase service-account key and set its full JSON in:
+   - `FCM_SERVICE_ACCOUNT_JSON` (Vercel + local env if testing locally)
+4. Set `CRON_SECRET` in Vercel environment variables.
+
+### Manual verification
+
+1. Open `/dashboard/notifications` and send a bilingual test broadcast.
+2. Confirm the response counts and history row in the page.
+3. Trigger reminder cron manually:
+
+```bash
+curl "https://your-domain.com/api/cron/review-reminders" \
+  -H "Authorization: Bearer $CRON_SECRET"
+```
+
+4. Confirm `review_reminder_sent_at` is set for targeted tokens and that
+   subsequent runs do not resend to the same rows.
 
 ## First-time admin setup
 

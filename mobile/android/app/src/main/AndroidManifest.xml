@@ -6,6 +6,8 @@
          but NOT the release one — without it the release APK silently
          fails every HTTPS call and the screens look empty. -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Android 13+ runtime permission required for FCM notifications. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <application
         android:label="Pasion Balcanica"

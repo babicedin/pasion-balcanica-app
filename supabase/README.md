@@ -18,6 +18,12 @@ Two options:
    - `migrations/0005_media_links.sql`
    - `migrations/0006_about_section.sql`
    - `migrations/0007_consolidate_app_schema.sql`
+   - `migrations/0008_reviews_and_share.sql`
+   - `migrations/0009_google_review_import.sql`
+   - `migrations/0010_shopping.sql`
+   - `migrations/0011_home_curation_flags.sql`
+   - `migrations/0011_push_notifications.sql`
+   - `migrations/0012_harden_device_tokens_rls.sql`
    - `seed/seed.sql`
 
 > **Note on the two `0004_*` files.** Both migrations are safe to re-run
@@ -25,6 +31,10 @@ Two options:
 > `food_category` enum, then `dynamic_categories` converts that enum into
 > the `food_categories` table. Migration 0007 later consolidates
 > `site_settings` into `about_section` and adds `food_spots.phone`.
+
+> **Note on `0011_*` files.** There are two migrations with the `0011_`
+> prefix (`home_curation_flags` and `push_notifications`). Run both before
+> `0012_harden_device_tokens_rls.sql`.
 
 > If the backoffice keeps showing `Could not find the table '…' in the schema cache`
 > after a migration, run `notify pgrst, 'reload schema';` in the SQL editor or

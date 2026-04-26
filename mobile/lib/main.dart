@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'providers/providers.dart';
+import 'push.dart';
 import 'screens/home_shell.dart';
 import 'supabase_client.dart';
 import 'theme/theme.dart';
@@ -22,6 +25,12 @@ Future<void> main() async {
     // Non-fatal: app still runs; data providers return empty until init works.
     debugPrint('Supabase init failed: $e');
   }
+
+  // Push notifications. Init is best-effort and never blocks UI; the
+  // device's persisted locale is loaded asynchronously by Riverpod, so we
+  // pass a sensible default here and let HomeShell re-call init() once
+  // the real locale is known.
+  unawaited(PushService.instance.init(locale: 'en'));
 
   // Edge-to-edge: lets the app paint behind the gesture/nav bar instead of
   // leaving Android's default black strip there (visible on some Xiaomi/MIUI
