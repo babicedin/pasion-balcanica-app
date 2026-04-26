@@ -9,7 +9,7 @@ export default async function FoodPage() {
   const [{ data: spots }, { data: categories }] = await Promise.all([
     supabase
       .from("food_spots")
-      .select("id, title_es, title_en, category, is_published, display_order")
+      .select("id, title_es, title_en, category, is_published, display_order, is_home_taste")
       .order("display_order", { ascending: true }),
     supabase.from("food_categories").select("slug, label_es, label_en"),
   ]);

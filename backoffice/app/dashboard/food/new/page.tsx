@@ -47,6 +47,7 @@ function NewFoodSpotForm() {
   const [youtubeUrls, setYoutubeUrls] = useState<string[]>([]);
   const [phone, setPhone] = useState("");
   const [isPublished, setIsPublished] = useState(true);
+  const [isHomeTaste, setIsHomeTaste] = useState(false);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -88,6 +89,7 @@ function NewFoodSpotForm() {
       youtube_urls: youtubeUrls.map((x) => x.trim()).filter(Boolean),
       display_order: nextOrder,
       is_published: isPublished,
+      is_home_taste: isHomeTaste,
     };
 
     const { error } = await supabase.from("food_spots").insert(payload);
@@ -172,6 +174,15 @@ function NewFoodSpotForm() {
               className="h-4 w-4 rounded border-line text-brand-purple focus:ring-brand-purple/30"
             />
             Published
+          </label>
+          <label className="inline-flex items-center gap-2 text-sm text-neutral-700">
+            <input
+              type="checkbox"
+              checked={isHomeTaste}
+              onChange={(e) => setIsHomeTaste(e.target.checked)}
+              className="h-4 w-4 rounded border-line text-brand-purple focus:ring-brand-purple/30"
+            />
+            A taste of Sarajevo (home section)
           </label>
           <p className="text-xs text-muted">
             Order is set by drag-and-drop on the food list. New items are

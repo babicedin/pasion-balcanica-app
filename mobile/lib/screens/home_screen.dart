@@ -26,6 +26,7 @@ class HomeScreen extends ConsumerWidget {
 
     final placesAsync = ref.watch(placesProvider);
     final foodAsync = ref.watch(foodSpotsProvider);
+    final shopsAsync = ref.watch(shopsProvider);
     final foodCategoriesAsync = ref.watch(foodCategoriesProvider);
     final foodCategories =
         foodCategoriesAsync.asData?.value ?? const <CategoryInfo>[];
@@ -37,10 +38,20 @@ class HomeScreen extends ConsumerWidget {
 
     final places = placesAsync.asData?.value ?? const <Place>[];
     final food = foodAsync.asData?.value ?? const <FoodSpot>[];
+    final shops = shopsAsync.asData?.value ?? const <Shop>[];
 
-    final hero = places.length > 1 ? places[1] : (places.isNotEmpty ? places.first : null);
-    final featured = places.take(3).toList();
-    final taste = food.take(4).toList();
+    final homePickCandidates = places.where((p) => p.isHomePick);
+    final hero = homePickCandidates.isNotEmpty
+        ? homePickCandidates.first
+        : (places.length > 1
+            ? places[1]
+            : (places.isNotEmpty ? places.first : null));
+    final curatedFeatured = places.where((p) => p.isHomeMustSee).toList();
+    final featured =
+        curatedFeatured.isNotEmpty ? curatedFeatured : places.take(3).toList();
+    final curatedTaste = food.where((f) => f.isHomeTaste).toList();
+    final taste =
+        curatedTaste.isNotEmpty ? curatedTaste : food.take(4).toList();
 
     return SafeArea(
       bottom: false,
@@ -79,7 +90,7 @@ class HomeScreen extends ConsumerWidget {
               ),
             ),
 
-          // Quick shortcuts: Places / Restaurants
+          // Quick shortcuts: Places / Restaurants / Shopping
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 18, 20, 6),
@@ -93,9 +104,8 @@ class HomeScreen extends ConsumerWidget {
                       count: places.length,
                       countSuffix: s.pins,
                       // Jump to the Places tab (index 1 — see home_shell.dart).
-                      onTap: () => ref
-                          .read(activeTabIndexProvider.notifier)
-                          .state = 1,
+                      onTap: () =>
+                          ref.read(activeTabIndexProvider.notifier).state = 1,
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -107,9 +117,21 @@ class HomeScreen extends ConsumerWidget {
                       count: food.length,
                       countSuffix: s.pins,
                       // Jump to the Food tab (index 2).
-                      onTap: () => ref
-                          .read(activeTabIndexProvider.notifier)
-                          .state = 2,
+                      onTap: () =>
+                          ref.read(activeTabIndexProvider.notifier).state = 2,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _ShortcutTile(
+                      icon: Icons.shopping_bag_rounded,
+                      tint: PBBrand.magenta,
+                      label: s.shoppingLabel,
+                      count: shops.length,
+                      countSuffix: s.pins,
+                      // Jump to the Shopping tab (index 3).
+                      onTap: () =>
+                          ref.read(activeTabIndexProvider.notifier).state = 3,
                     ),
                   ),
                 ],
@@ -240,7 +262,11 @@ class _HeroCard extends StatelessWidget {
   final Place place;
   final String locale;
   final VoidCallback onTap;
-  const _HeroCard({required this.place, required this.locale, required this.onTap});
+  const _HeroCard({
+    required this.place,
+    required this.locale,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -306,11 +332,12 @@ class _HeroCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       place.titleFor(locale),
-                      style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                            color: Colors.white,
-                            fontSize: 28,
-                            letterSpacing: -0.28,
-                          ),
+                      style:
+                          Theme.of(context).textTheme.headlineLarge?.copyWith(
+                                color: Colors.white,
+                                fontSize: 28,
+                                letterSpacing: -0.28,
+                              ),
                     ),
                     const SizedBox(height: 6),
                     Text(
@@ -728,4 +755,3 @@ class _AboutTeaser extends StatelessWidget {
     );
   }
 }
-

@@ -15,6 +15,7 @@ export type FoodListItem = {
   category: string;
   is_published: boolean;
   display_order: number;
+  is_home_taste: boolean;
 };
 
 export function FoodList({
@@ -88,6 +89,11 @@ export function FoodList({
               <div className="text-xs text-muted truncate">
                 {formatCategory(s.category)} · {s.title_es}
               </div>
+              {s.is_home_taste && (
+                <span className="mt-1 inline-flex rounded-full border border-brand-purple/30 bg-brand-purple/10 px-2 py-0.5 text-[10px] font-medium text-brand-purple">
+                  A taste of Sarajevo
+                </span>
+              )}
             </div>
             <div className="flex-shrink-0">
               <StatusBadge published={s.is_published} />

@@ -22,16 +22,19 @@ class S {
   String get welcome => isEs ? 'BIENVENIDOS' : 'WELCOME';
   String discoverPre(String city) => isEs ? 'Descubre ' : 'Discover ';
   String discoverPost() => isEs ? ' con nosotros.' : ', with us.';
-  String get todaysPick => isEs ? 'DESTACADO DE HOY' : "TODAY'S PICK";
+  String get todaysPick => isEs ? 'NUESTRA SELECCIÓN' : 'OUR PICK';
   String get yourGuide => isEs ? 'TU GUÍA' : 'YOUR GUIDE';
   String get tapToMeet => isEs ? 'Toca para conocer' : 'Tap to meet';
   String get freeWalkingTour => isEs ? 'Caminata libre' : 'Free walking tour';
-  String get mustSeePlaces => isEs ? 'Lugares imprescindibles' : 'Must-see places';
+  String get mustSeePlaces =>
+      isEs ? 'Lugares imprescindibles' : 'Must-see places';
   String get seeAll => isEs ? 'Ver todo' : 'See all';
-  String get tasteOfSarajevo => isEs ? 'Sabor de Sarajevo' : 'A taste of Sarajevo';
+  String get tasteOfSarajevo =>
+      isEs ? 'Sabor de Sarajevo' : 'A taste of Sarajevo';
   String get pins => isEs ? 'marcadores' : 'pins';
   String get placesLabel => isEs ? 'Lugares' : 'Places';
   String get restaurantsLabel => isEs ? 'Restaurantes' : 'Restaurants';
+  String get shoppingLabel => isEs ? 'Compras' : 'Shopping';
 
   // Places list
   String get explore => isEs ? 'EXPLORAR' : 'EXPLORE';
@@ -39,7 +42,8 @@ class S {
   String get placesToVisitAccent => isEs ? 'visitar' : 'visit';
   String placesSubtitle(int n) =>
       isEs ? '$n paradas seleccionadas a mano.' : '$n hand-picked stops.';
-  String get searchPlaces => isEs ? 'Buscar lugares, barrios...' : 'Search places, neighborhoods…';
+  String get searchPlaces =>
+      isEs ? 'Buscar lugares, barrios...' : 'Search places, neighborhoods…';
 
   // Food list
   String get eatAndDrink => isEs ? 'COMER Y BEBER' : 'EAT & DRINK';
@@ -49,14 +53,17 @@ class S {
 
   // Shopping list
   String get shopAndBrowse => isEs ? 'IR DE COMPRAS' : 'SHOPPING';
-  String get whereLocalsShopPre => isEs ? 'Dónde compran los ' : 'Where locals ';
+  String get whereLocalsShopPre =>
+      isEs ? 'Dónde compran los ' : 'Where locals ';
   String get whereLocalsShopAccent => isEs ? 'locales' : 'shop';
 
   // Numbers
   String get justInCase => isEs ? 'POR SI ACASO' : 'JUST IN CASE';
   String get importantNumbersPre => isEs ? 'Números ' : 'Important ';
   String get importantNumbersAccent => isEs ? 'importantes' : 'numbers';
-  String get tapToCall => isEs ? 'Toca cualquier fila para llamar al instante.' : 'Tap any row to call instantly.';
+  String get tapToCall => isEs
+      ? 'Toca cualquier fila para llamar al instante.'
+      : 'Tap any row to call instantly.';
   String get callCta => isEs ? 'Llamar' : 'Call';
   String get emergencyTip => isEs
       ? '💡 En emergencias médicas graves, llama al 112 (número europeo unificado).'
@@ -74,7 +81,9 @@ class S {
   // when a review row lacks an explicit author.
   String get recentReview => isEs ? 'una reseña reciente' : 'a recent review';
   String get reviewOnGoogle => isEs ? 'Reseñar en Google' : 'Review on Google';
-  String get opensGoogleMaps => isEs ? 'Abre Google Maps · se necesita cuenta' : 'Opens Google Maps · account required';
+  String get opensGoogleMaps => isEs
+      ? 'Abre Google Maps · se necesita cuenta'
+      : 'Opens Google Maps · account required';
   String get tapToReadFullReview =>
       isEs ? 'Toca para leer la reseña completa' : 'Tap to read full review';
   String get shareApp => isEs ? 'Compartir' : 'Share app';
@@ -82,7 +91,9 @@ class S {
   String get whatsapp => 'WhatsApp';
 
   // About
-  String get aboutRoleTagline => isEs ? 'Guía de caminata libre, Sarajevo' : 'Free walking tour guide, Sarajevo';
+  String get aboutRoleTagline => isEs
+      ? 'Guía de caminata libre, Sarajevo'
+      : 'Free walking tour guide, Sarajevo';
   String get walkers => isEs ? 'Caminantes' : 'Walkers';
   String get rating => isEs ? 'Valoración' : 'Rating';
   String get guiding => isEs ? 'Guiando' : 'Guiding';
@@ -110,10 +121,12 @@ class S {
   String get location => isEs ? 'Ubicación' : 'Location';
   String get gallery => isEs ? 'Galería' : 'Gallery';
   String get videos => isEs ? 'Videos' : 'Videos';
-  String get walkthroughTitle => isEs ? 'Un recorrido de 3 min' : 'A 3-min walkthrough';
+  String get walkthroughTitle =>
+      isEs ? 'Un recorrido de 3 min' : 'A 3-min walkthrough';
 
   // Common
-  String get somethingWentWrong => isEs ? 'Algo salió mal' : 'Something went wrong';
+  String get somethingWentWrong =>
+      isEs ? 'Algo salió mal' : 'Something went wrong';
 
   static const en = S._('en');
   static const es = S._('es');

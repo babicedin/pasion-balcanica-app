@@ -29,8 +29,7 @@ class CategoryInfo {
         displayOrder: (m['display_order'] ?? 0) as int,
       );
 
-  String labelFor(String locale) =>
-      locale.startsWith('es') ? labelEs : labelEn;
+  String labelFor(String locale) => locale.startsWith('es') ? labelEs : labelEn;
 
   /// Fallback used when a record references a category slug that isn't in
   /// the categories table (stale FK, freshly inserted row, etc).
@@ -57,6 +56,8 @@ class Place {
   final String? address;
   final List<String> imageUrls;
   final List<String> youtubeUrls;
+  final bool isHomePick;
+  final bool isHomeMustSee;
 
   const Place({
     required this.id,
@@ -71,6 +72,8 @@ class Place {
     required this.address,
     required this.imageUrls,
     required this.youtubeUrls,
+    required this.isHomePick,
+    required this.isHomeMustSee,
   });
 
   factory Place.fromMap(Map<String, dynamic> m) {
@@ -89,6 +92,8 @@ class Place {
       address: m['address'] as String?,
       imageUrls: photos,
       youtubeUrls: videos,
+      isHomePick: (m['is_home_pick'] ?? false) as bool,
+      isHomeMustSee: (m['is_home_must_see'] ?? false) as bool,
     );
   }
 
@@ -96,7 +101,8 @@ class Place {
   int get videoCount => youtubeUrls.length;
 
   String titleFor(String locale) => locale.startsWith('es') ? titleEs : titleEn;
-  String kickerFor(String locale) => locale.startsWith('es') ? kickerEs : kickerEn;
+  String kickerFor(String locale) =>
+      locale.startsWith('es') ? kickerEs : kickerEn;
   String descriptionFor(String locale) =>
       locale.startsWith('es') ? descriptionEs : descriptionEn;
 }
@@ -117,6 +123,7 @@ class FoodSpot {
   final double? longitude;
   final String? address;
   final String? phone;
+  final bool isHomeTaste;
 
   const FoodSpot({
     required this.id,
@@ -133,6 +140,7 @@ class FoodSpot {
     required this.longitude,
     required this.address,
     required this.phone,
+    required this.isHomeTaste,
   });
 
   factory FoodSpot.fromMap(Map<String, dynamic> m) => FoodSpot(
@@ -150,13 +158,15 @@ class FoodSpot {
         longitude: (m['longitude'] as num?)?.toDouble(),
         address: m['address'] as String?,
         phone: m['phone'] as String?,
+        isHomeTaste: (m['is_home_taste'] ?? false) as bool,
       );
 
   String get heroImageUrl => imageUrls.isNotEmpty ? imageUrls.first : '';
   int get videoCount => youtubeUrls.length;
 
   String titleFor(String locale) => locale.startsWith('es') ? titleEs : titleEn;
-  String kickerFor(String locale) => locale.startsWith('es') ? kickerEs : kickerEn;
+  String kickerFor(String locale) =>
+      locale.startsWith('es') ? kickerEs : kickerEn;
   String descriptionFor(String locale) =>
       locale.startsWith('es') ? descriptionEs : descriptionEn;
 }
@@ -219,7 +229,8 @@ class Shop {
   int get videoCount => youtubeUrls.length;
 
   String titleFor(String locale) => locale.startsWith('es') ? titleEs : titleEn;
-  String kickerFor(String locale) => locale.startsWith('es') ? kickerEs : kickerEn;
+  String kickerFor(String locale) =>
+      locale.startsWith('es') ? kickerEs : kickerEn;
   String descriptionFor(String locale) =>
       locale.startsWith('es') ? descriptionEs : descriptionEn;
 }
@@ -358,7 +369,8 @@ class SiteSettings {
         shareUrl: (m['share_url'] ?? '') as String,
       );
 
-  String bioFor(String locale) => locale.startsWith('es') ? guideBioEs : guideBioEn;
+  String bioFor(String locale) =>
+      locale.startsWith('es') ? guideBioEs : guideBioEn;
   String taglineFor(String locale) =>
       locale.startsWith('es') ? guideTaglineEs : guideTaglineEn;
 

@@ -44,6 +44,8 @@ function NewPlaceForm() {
   const [photoUrls, setPhotoUrls] = useState<string[]>([]);
   const [youtubeUrls, setYoutubeUrls] = useState<string[]>([]);
   const [isPublished, setIsPublished] = useState(true);
+  const [isHomePick, setIsHomePick] = useState(false);
+  const [isHomeMustSee, setIsHomeMustSee] = useState(false);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -84,6 +86,8 @@ function NewPlaceForm() {
       youtube_urls: youtubeUrls.map((x) => x.trim()).filter(Boolean),
       display_order: nextOrder,
       is_published: isPublished,
+      is_home_pick: isHomePick,
+      is_home_must_see: isHomeMustSee,
     };
 
     const { error } = await supabase.from("places_to_visit").insert(payload);
@@ -146,6 +150,24 @@ function NewPlaceForm() {
               className="h-4 w-4 rounded border-line text-brand-purple focus:ring-brand-purple/30"
             />
             Published
+          </label>
+          <label className="inline-flex items-center gap-2 text-sm text-neutral-700">
+            <input
+              type="checkbox"
+              checked={isHomePick}
+              onChange={(e) => setIsHomePick(e.target.checked)}
+              className="h-4 w-4 rounded border-line text-brand-purple focus:ring-brand-purple/30"
+            />
+            Today&apos;s pick (home hero badge)
+          </label>
+          <label className="inline-flex items-center gap-2 text-sm text-neutral-700">
+            <input
+              type="checkbox"
+              checked={isHomeMustSee}
+              onChange={(e) => setIsHomeMustSee(e.target.checked)}
+              className="h-4 w-4 rounded border-line text-brand-purple focus:ring-brand-purple/30"
+            />
+            Must-see places (home section)
           </label>
           <p className="text-xs text-muted mt-2">
             Order is set by drag-and-drop on the places list. New items are

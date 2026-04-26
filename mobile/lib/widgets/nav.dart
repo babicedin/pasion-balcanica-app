@@ -2,7 +2,6 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-import '../l10n/strings.dart';
 import '../theme/palette.dart';
 
 /// Tab identity for the floating nav — maps 1:1 with [HomeShell] pages.
@@ -11,34 +10,43 @@ enum PBTab { home, places, food, shopping, numbers, review }
 /// Floating liquid-glass bottom nav.
 ///
 /// - Pill sits 14px above the safe bottom.
-/// - Active tab swells a little and shows its label inside a gradient chip.
-/// - Inactive tabs are icon-only.
+/// - Active tab swells and uses a gradient chip.
+/// - All tabs are icon-only.
 /// - Uses BackdropFilter for the real frosted look.
 class PBFloatingNav extends StatelessWidget {
   final PBTab active;
-  final String locale;
   final ValueChanged<PBTab> onTap;
 
   const PBFloatingNav({
     super.key,
     required this.active,
-    required this.locale,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     final pb = context.pb;
-    final s = S.of(locale);
     final bottom = MediaQuery.of(context).padding.bottom;
 
     final items = <_NavItem>[
-      _NavItem(PBTab.home, Icons.home_rounded, Icons.home_outlined, s.tabHome),
-      _NavItem(PBTab.places, Icons.place_rounded, Icons.place_outlined, s.tabPlaces),
-      _NavItem(PBTab.food, Icons.restaurant_rounded, Icons.restaurant_outlined, s.tabFood),
-      _NavItem(PBTab.shopping, Icons.shopping_bag_rounded, Icons.shopping_bag_outlined, s.tabShopping),
-      _NavItem(PBTab.numbers, Icons.call_rounded, Icons.call_outlined, s.tabNumbers),
-      _NavItem(PBTab.review, Icons.star_rounded, Icons.star_outline_rounded, s.tabReview),
+      const _NavItem(PBTab.home, Icons.home_rounded, Icons.home_outlined),
+      const _NavItem(PBTab.places, Icons.place_rounded, Icons.place_outlined),
+      const _NavItem(
+        PBTab.food,
+        Icons.restaurant_rounded,
+        Icons.restaurant_outlined,
+      ),
+      const _NavItem(
+        PBTab.shopping,
+        Icons.shopping_bag_rounded,
+        Icons.shopping_bag_outlined,
+      ),
+      const _NavItem(PBTab.numbers, Icons.call_rounded, Icons.call_outlined),
+      const _NavItem(
+        PBTab.review,
+        Icons.star_rounded,
+        Icons.star_outline_rounded,
+      ),
     ];
 
     return Padding(
@@ -93,8 +101,7 @@ class _NavItem {
   final PBTab tab;
   final IconData filled;
   final IconData outlined;
-  final String label;
-  const _NavItem(this.tab, this.filled, this.outlined, this.label);
+  const _NavItem(this.tab, this.filled, this.outlined);
 }
 
 class _NavButton extends StatelessWidget {
@@ -140,30 +147,10 @@ class _NavButton extends StatelessWidget {
                   ]
                 : null,
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                active ? item.filled : item.outlined,
-                size: 20,
-                color: active ? Colors.white : pb.ink2,
-              ),
-              if (active) ...[
-                const SizedBox(height: 2),
-                Text(
-                  item.label,
-                  maxLines: 1,
-                  overflow: TextOverflow.fade,
-                  softWrap: false,
-                  style: const TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                    letterSpacing: 0.1,
-                  ),
-                ),
-              ],
-            ],
+          child: Icon(
+            active ? item.filled : item.outlined,
+            size: 20,
+            color: active ? Colors.white : pb.ink2,
           ),
         ),
       ),

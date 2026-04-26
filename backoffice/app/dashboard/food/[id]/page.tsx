@@ -36,6 +36,7 @@ type FoodRow = {
   youtube_urls: string[] | null;
   display_order: number;
   is_published: boolean;
+  is_home_taste: boolean;
 };
 
 export default function EditFoodSpotPage() {
@@ -54,6 +55,7 @@ export default function EditFoodSpotPage() {
         .from("food_spots")
         .select(
           "id, title_es, title_en, kicker_es, kicker_en, description_es, description_en, category, address, latitude, longitude, phone, photo_urls, youtube_urls, display_order, is_published"
+          + ", is_home_taste"
         )
         .eq("id", id)
         .maybeSingle();
@@ -134,6 +136,7 @@ function EditFoodSpotForm({
   const [youtubeUrls, setYoutubeUrls] = useState<string[]>(record.youtube_urls ?? []);
   const [phone, setPhone] = useState<string>(record.phone ?? "");
   const [isPublished, setIsPublished] = useState(record.is_published);
+  const [isHomeTaste, setIsHomeTaste] = useState(record.is_home_taste);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -166,6 +169,7 @@ function EditFoodSpotForm({
       photo_urls: photoUrls.map((x) => x.trim()).filter(Boolean),
       youtube_urls: youtubeUrls.map((x) => x.trim()).filter(Boolean),
       is_published: isPublished,
+      is_home_taste: isHomeTaste,
     };
 
     const supabase = createSupabaseBrowserClient();
@@ -269,6 +273,15 @@ function EditFoodSpotForm({
               className="h-4 w-4 rounded border-line text-brand-purple focus:ring-brand-purple/30"
             />
             Published
+          </label>
+          <label className="inline-flex items-center gap-2 text-sm text-neutral-700">
+            <input
+              type="checkbox"
+              checked={isHomeTaste}
+              onChange={(e) => setIsHomeTaste(e.target.checked)}
+              className="h-4 w-4 rounded border-line text-brand-purple focus:ring-brand-purple/30"
+            />
+            A taste of Sarajevo (home section)
           </label>
           <p className="text-xs text-muted">
             Order is managed by drag-and-drop on the food list.

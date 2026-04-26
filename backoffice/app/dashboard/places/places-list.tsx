@@ -14,6 +14,8 @@ export type PlaceListItem = {
   title_es: string;
   is_published: boolean;
   display_order: number;
+  is_home_pick: boolean;
+  is_home_must_see: boolean;
 };
 
 export function PlacesList({ initial }: { initial: PlaceListItem[] }) {
@@ -82,6 +84,18 @@ export function PlacesList({ initial }: { initial: PlaceListItem[] }) {
                 {p.title_en}
               </Link>
               <div className="text-xs text-muted truncate">{p.title_es}</div>
+              <div className="mt-1 flex flex-wrap gap-1.5">
+                {p.is_home_pick && (
+                  <span className="rounded-full border border-brand-purple/30 bg-brand-purple/10 px-2 py-0.5 text-[10px] font-medium text-brand-purple">
+                    Today&apos;s pick
+                  </span>
+                )}
+                {p.is_home_must_see && (
+                  <span className="rounded-full border border-brand-indigo/30 bg-brand-indigo/10 px-2 py-0.5 text-[10px] font-medium text-brand-indigo">
+                    Must-see places
+                  </span>
+                )}
+              </div>
             </div>
             <div className="flex-shrink-0">
               <StatusBadge published={p.is_published} />

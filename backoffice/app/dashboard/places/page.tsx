@@ -8,7 +8,9 @@ export default async function PlacesPage() {
   const supabase = createSupabaseServerClient();
   const { data: places } = await supabase
     .from("places_to_visit")
-    .select("id, title_es, title_en, is_published, display_order")
+    .select(
+      "id, title_es, title_en, is_published, display_order, is_home_pick, is_home_must_see"
+    )
     .order("display_order", { ascending: true });
 
   return (

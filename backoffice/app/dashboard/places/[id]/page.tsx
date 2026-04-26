@@ -33,6 +33,8 @@ type PlaceRow = {
   youtube_urls: string[] | null;
   display_order: number;
   is_published: boolean;
+  is_home_pick: boolean;
+  is_home_must_see: boolean;
 };
 
 export default function EditPlacePage() {
@@ -51,6 +53,7 @@ export default function EditPlacePage() {
         .from("places_to_visit")
         .select(
           "id, title_es, title_en, kicker_es, kicker_en, description_es, description_en, address, latitude, longitude, photo_urls, youtube_urls, display_order, is_published"
+          + ", is_home_pick, is_home_must_see"
         )
         .eq("id", id)
         .maybeSingle();
@@ -129,6 +132,8 @@ function EditPlaceForm({
   const [photoUrls, setPhotoUrls] = useState<string[]>(record.photo_urls ?? []);
   const [youtubeUrls, setYoutubeUrls] = useState<string[]>(record.youtube_urls ?? []);
   const [isPublished, setIsPublished] = useState(record.is_published);
+  const [isHomePick, setIsHomePick] = useState(record.is_home_pick);
+  const [isHomeMustSee, setIsHomeMustSee] = useState(record.is_home_must_see);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -159,6 +164,8 @@ function EditPlaceForm({
       photo_urls: photoUrls.map((x) => x.trim()).filter(Boolean),
       youtube_urls: youtubeUrls.map((x) => x.trim()).filter(Boolean),
       is_published: isPublished,
+      is_home_pick: isHomePick,
+      is_home_must_see: isHomeMustSee,
     };
 
     const supabase = createSupabaseBrowserClient();
@@ -242,6 +249,24 @@ function EditPlaceForm({
               className="h-4 w-4 rounded border-line text-brand-purple focus:ring-brand-purple/30"
             />
             Published
+          </label>
+          <label className="inline-flex items-center gap-2 text-sm text-neutral-700">
+            <input
+              type="checkbox"
+              checked={isHomePick}
+              onChange={(e) => setIsHomePick(e.target.checked)}
+              className="h-4 w-4 rounded border-line text-brand-purple focus:ring-brand-purple/30"
+            />
+            Today&apos;s pick (home hero badge)
+          </label>
+          <label className="inline-flex items-center gap-2 text-sm text-neutral-700">
+            <input
+              type="checkbox"
+              checked={isHomeMustSee}
+              onChange={(e) => setIsHomeMustSee(e.target.checked)}
+              className="h-4 w-4 rounded border-line text-brand-purple focus:ring-brand-purple/30"
+            />
+            Must-see places (home section)
           </label>
           <p className="text-xs text-muted mt-2">
             Order is managed by drag-and-drop on the places list.

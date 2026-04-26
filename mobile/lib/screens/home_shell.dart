@@ -26,7 +26,6 @@ class HomeShell extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final pb = context.pb;
-    final locale = ref.watch(localeProvider);
     final activeIndex = ref.watch(activeTabIndexProvider);
     final active = PBTab.values[activeIndex.clamp(0, PBTab.values.length - 1)];
 
@@ -53,7 +52,6 @@ class HomeShell extends ConsumerWidget {
             bottom: 0,
             child: PBFloatingNav(
               active: active,
-              locale: locale,
               onTap: (t) => ref.read(activeTabIndexProvider.notifier).state =
                   PBTab.values.indexOf(t),
             ),
