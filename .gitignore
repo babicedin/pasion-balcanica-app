@@ -63,3 +63,4 @@ Thumbs.db
 *.pem
 *.p12
 *.key
+*.hprof

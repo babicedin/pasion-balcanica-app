@@ -29,21 +29,28 @@ class HomeShell extends ConsumerStatefulWidget {
 }
 
 class _HomeShellState extends ConsumerState<HomeShell> {
-  bool _pushTapHandlersAttached = false;
+  bool _pushBootstrapped = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Defer push setup until after the first frame so any FCM /
+    // Play-Services failure can never freeze or gray out the UI. The
+    // call is also wrapped in its own try/catch inside PushService.
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (_pushBootstrapped) return;
+      _pushBootstrapped = true;
+      final locale = ref.read(localeProvider);
+      await PushService.instance.init(locale: locale);
+      if (mounted) PushService.instance.attachTapHandlers(ref);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final pb = context.pb;
     final activeIndex = ref.watch(activeTabIndexProvider);
     final active = PBTab.values[activeIndex.clamp(0, PBTab.values.length - 1)];
-
-    // One-time: hook FCM tap callbacks into our Riverpod ref so a tap
-    // on a notification can flip the active tab. Idempotent — guarded by
-    // the bool so a rebuild doesn't double-subscribe.
-    if (!_pushTapHandlersAttached) {
-      _pushTapHandlersAttached = true;
-      PushService.instance.attachTapHandlers(ref);
-    }
 
     // Re-register the device token whenever the user changes language so
     // future broadcasts arrive in their preferred locale.
