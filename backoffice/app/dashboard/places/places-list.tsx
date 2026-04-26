@@ -1,12 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { DragHandle, SortableList } from "@/components/sortable-list";
 import { StatusBadge } from "@/components/status-badge";
-import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export type PlaceListItem = {
   id: string;
@@ -19,36 +17,31 @@ export type PlaceListItem = {
 };
 
 export function PlacesList({ initial }: { initial: PlaceListItem[] }) {
-  const router = useRouter();
   const [items, setItems] = useState(initial);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function persist(next: PlaceListItem[]) {
     const prev = items;
-    setItems(next);
+    const nextWithOrder = next.map((item, idx) => ({ ...item, display_order: idx }));
+    setItems(nextWithOrder);
     setSaving(true);
     setError(null);
-    const supabase = createSupabaseBrowserClient();
-    const updates = next
-      .map((item, idx) => ({ id: item.id, display_order: idx }))
-      .filter((u, idx) => prev[idx]?.id !== u.id || prev[idx]?.display_order !== u.display_order);
-    const results = await Promise.all(
-      updates.map((u) =>
-        supabase
-          .from("places_to_visit")
-          .update({ display_order: u.display_order })
-          .eq("id", u.id)
-      )
-    );
-    const firstError = results.find((r) => r.error)?.error;
     setSaving(false);
-    if (firstError) {
-      setError(firstError.message);
+    const res = await fetch("/api/reorder", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        entity: "places",
+        ids: nextWithOrder.map((item) => item.id),
+      }),
+    });
+    if (!res.ok) {
+      const detail = await res.json().catch(() => ({}));
+      setError((detail as { error?: string }).error ?? `HTTP ${res.status}`);
       setItems(prev);
       return;
     }
-    router.refresh();
   }
 
   return (

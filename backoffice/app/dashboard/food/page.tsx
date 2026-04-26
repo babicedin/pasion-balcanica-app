@@ -1,19 +1,33 @@
 import Link from "next/link";
 import { Plus, UtensilsCrossed } from "lucide-react";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { PaginationControls } from "@/components/pagination-controls";
 import { EmptyState, PageHeader } from "@/components/page-header";
 import { FoodList, type FoodListItem } from "./food-list";
 
-export default async function FoodPage() {
+const PAGE_SIZE = 50;
+
+export default async function FoodPage({
+  searchParams,
+}: {
+  searchParams?: { page?: string };
+}) {
   const supabase = createSupabaseServerClient();
-  const [{ data: spots }, { data: categories }] = await Promise.all([
+  const pageRaw = Number(searchParams?.page ?? "1");
+  const page = Number.isFinite(pageRaw) && pageRaw > 0 ? Math.floor(pageRaw) : 1;
+  const from = (page - 1) * PAGE_SIZE;
+  const to = from + PAGE_SIZE - 1;
+  const [{ data: spots, count: total }, { data: categories }] = await Promise.all([
     supabase
       .from("food_spots")
-      .select("id, title_es, title_en, category, is_published, display_order, is_home_taste")
-      .order("display_order", { ascending: true }),
+      .select(
+        "id, title_es, title_en, category, is_published, display_order, is_home_taste",
+        { count: "exact" }
+      )
+      .order("display_order", { ascending: true })
+      .range(from, to),
     supabase.from("food_categories").select("slug, label_es, label_en"),
   ]);
-
   const categoryLabel: Record<string, string> = Object.fromEntries(
     (categories ?? []).map((c) => [
       c.slug as string,
@@ -35,7 +49,7 @@ export default async function FoodPage() {
         }
       />
 
-      {!spots || spots.length === 0 ? (
+      {(total ?? 0) === 0 ? (
         <EmptyState
           icon={<UtensilsCrossed size={20} strokeWidth={1.75} />}
           title="No food spots yet"
@@ -48,10 +62,18 @@ export default async function FoodPage() {
           }
         />
       ) : (
-        <FoodList
-          initial={(spots ?? []) as FoodListItem[]}
-          categoryLabel={categoryLabel}
-        />
+        <div className="space-y-4">
+          <FoodList
+            initial={(spots ?? []) as FoodListItem[]}
+            categoryLabel={categoryLabel}
+          />
+          <PaginationControls
+            basePath="/dashboard/food"
+            page={page}
+            pageSize={PAGE_SIZE}
+            total={total ?? 0}
+          />
+        </div>
       )}
     </div>
   );

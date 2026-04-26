@@ -67,23 +67,25 @@ export function ReviewsList({
 
   async function persist(next: ReviewListItem[]) {
     const prev = items;
-    setItems(next);
+    const nextWithOrder = next.map((item, idx) => ({ ...item, display_order: idx }));
+    setItems(nextWithOrder);
     setSaving(true);
     setError(null);
-    const supabase = createSupabaseBrowserClient();
-    const results = await Promise.all(
-      next.map((item, idx) =>
-        supabase.from("reviews").update({ display_order: idx }).eq("id", item.id)
-      )
-    );
-    const firstError = results.find((r) => r.error)?.error;
+    const res = await fetch("/api/reorder", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        entity: "reviews",
+        ids: nextWithOrder.map((item) => item.id),
+      }),
+    });
     setSaving(false);
-    if (firstError) {
-      setError(firstError.message);
+    if (!res.ok) {
+      const detail = await res.json().catch(() => ({}));
+      setError((detail as { error?: string }).error ?? `HTTP ${res.status}`);
       setItems(prev);
       return;
     }
-    router.refresh();
   }
 
   async function triggerSync() {

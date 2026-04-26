@@ -1,18 +1,31 @@
 import Link from "next/link";
 import { Phone, Plus } from "lucide-react";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { PaginationControls } from "@/components/pagination-controls";
 import { EmptyState, PageHeader } from "@/components/page-header";
 import { NumbersList, type NumberListItem } from "./numbers-list";
 
-export default async function NumbersPage() {
+const PAGE_SIZE = 50;
+
+export default async function NumbersPage({
+  searchParams,
+}: {
+  searchParams?: { page?: string };
+}) {
   const supabase = createSupabaseServerClient();
-  const [{ data: numbers }, { data: categories }] = await Promise.all([
+  const pageRaw = Number(searchParams?.page ?? "1");
+  const page = Number.isFinite(pageRaw) && pageRaw > 0 ? Math.floor(pageRaw) : 1;
+  const from = (page - 1) * PAGE_SIZE;
+  const to = from + PAGE_SIZE - 1;
+  const [{ data: numbers, count: total }, { data: categories }] = await Promise.all([
     supabase
       .from("important_numbers")
       .select(
-        "id, label_es, label_en, phone_number, category, icon, is_published, display_order"
+        "id, label_es, label_en, phone_number, category, icon, is_published, display_order",
+        { count: "exact" }
       )
-      .order("display_order", { ascending: true }),
+      .order("display_order", { ascending: true })
+      .range(from, to),
     supabase.from("number_categories").select("slug, label_es, label_en"),
   ]);
 
@@ -37,7 +50,7 @@ export default async function NumbersPage() {
         }
       />
 
-      {!numbers || numbers.length === 0 ? (
+      {(total ?? 0) === 0 ? (
         <EmptyState
           icon={<Phone size={20} strokeWidth={1.75} />}
           title="No numbers yet"
@@ -50,10 +63,18 @@ export default async function NumbersPage() {
           }
         />
       ) : (
-        <NumbersList
-          initial={(numbers ?? []) as NumberListItem[]}
-          categoryLabel={categoryLabel}
-        />
+        <div className="space-y-4">
+          <NumbersList
+            initial={(numbers ?? []) as NumberListItem[]}
+            categoryLabel={categoryLabel}
+          />
+          <PaginationControls
+            basePath="/dashboard/numbers"
+            page={page}
+            pageSize={PAGE_SIZE}
+            total={total ?? 0}
+          />
+        </div>
       )}
     </div>
   );
