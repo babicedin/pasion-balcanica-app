@@ -33,7 +33,7 @@ class S {
       isEs ? 'Sabor de Sarajevo' : 'A taste of Sarajevo';
   String get pins => isEs ? 'marcadores' : 'pins';
   String get placesLabel => isEs ? 'Lugares' : 'Places';
-  String get restaurantsLabel => isEs ? 'Gastronomía' : 'Eat & Drink';
+  String get restaurantsLabel => 'Gastro';
   String get shoppingLabel => isEs ? 'Compras' : 'Shopping';
 
   // Places list

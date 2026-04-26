@@ -4,15 +4,6 @@ import { Bell, Loader2, Send } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 
-import {
-  BilingualInput,
-  BilingualProvider,
-  BilingualTextarea,
-  LanguageTabs,
-  useBilingual,
-  type BilingualValues,
-} from "@/components/bilingual-form";
-
 export type NotificationRow = {
   id: string;
   kind: "broadcast" | "review_reminder";
@@ -26,11 +17,6 @@ export type NotificationRow = {
   sent_at: string;
 };
 
-const EMPTY: BilingualValues = {
-  title: { en: "", es: "" },
-  body: { en: "", es: "" },
-};
-
 export function NotificationsComposer({
   deviceCount,
   history,
@@ -38,11 +24,7 @@ export function NotificationsComposer({
   deviceCount: number;
   history: NotificationRow[];
 }) {
-  return (
-    <BilingualProvider initialValues={EMPTY}>
-      <ComposerInner deviceCount={deviceCount} history={history} />
-    </BilingualProvider>
-  );
+  return <ComposerInner deviceCount={deviceCount} history={history} />;
 }
 
 function ComposerInner({
@@ -53,9 +35,10 @@ function ComposerInner({
   history: NotificationRow[];
 }) {
   const router = useRouter();
-  const { values } = useBilingual();
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [title, setTitle] = useState("");
+  const [body, setBody] = useState("");
   const [lastResult, setLastResult] = useState<{
     targets: number;
     sent: number;
@@ -65,15 +48,11 @@ function ComposerInner({
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const titleEn = values.title?.en.trim() ?? "";
-    const titleEs = values.title?.es.trim() ?? "";
-    const bodyEn = values.body?.en.trim() ?? "";
-    const bodyEs = values.body?.es.trim() ?? "";
+    const titleValue = title.trim();
+    const bodyValue = body.trim();
 
-    if (!titleEn || !titleEs || !bodyEn || !bodyEs) {
-      setError(
-        "Title and body are required in both English and Spanish. Use Copy EN → ES to seed the Spanish side."
-      );
+    if (!titleValue || !bodyValue) {
+      setError("Title and body are required.");
       return;
     }
 
@@ -93,10 +72,8 @@ function ComposerInner({
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
-        title_en: titleEn,
-        title_es: titleEs,
-        body_en: bodyEn,
-        body_es: bodyEs,
+        title: titleValue,
+        body: bodyValue,
       }),
     });
 
@@ -121,20 +98,39 @@ function ComposerInner({
     <div className="space-y-8">
       <form onSubmit={onSubmit} className="space-y-6">
         <div className="card p-6 md:p-7 space-y-5">
-          <LanguageTabs hint="Write the message once in each language. The mobile app picks the variant matching each device's locale." />
-          <BilingualInput
-            name="title"
-            label="Title"
-            required
-            placeholder="A new tour is live"
-          />
-          <BilingualTextarea
-            name="body"
-            label="Body"
-            required
-            rows={4}
-            placeholder="Join me Saturday at 11:00 — Yellow Bastion → Old Town."
-          />
+          <h2 className="text-base font-semibold text-brand-ink">
+            Immediate notification test
+          </h2>
+          <p className="text-sm text-muted">
+            Type a message and send it now to all active devices.
+          </p>
+          <label className="block space-y-1">
+            <span className="text-xs uppercase tracking-wider text-neutral-500 font-semibold">
+              Title
+            </span>
+            <input
+              value={title}
+              onChange={(event) => setTitle(event.target.value)}
+              className="input"
+              required
+              placeholder="A new tour is live"
+              maxLength={80}
+            />
+          </label>
+          <label className="block space-y-1">
+            <span className="text-xs uppercase tracking-wider text-neutral-500 font-semibold">
+              Body
+            </span>
+            <textarea
+              value={body}
+              onChange={(event) => setBody(event.target.value)}
+              className="textarea min-h-[110px]"
+              required
+              rows={4}
+              placeholder="Join me Saturday at 11:00 — Yellow Bastion to Old Town."
+              maxLength={350}
+            />
+          </label>
         </div>
 
         {error && (
@@ -206,7 +202,6 @@ function HistoryRow({ row }: { row: NotificationRow }) {
           <div className="font-medium text-brand-ink truncate">
             {row.title_en}
           </div>
-          <div className="text-xs text-muted truncate">{row.title_es}</div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           {isReminder && (

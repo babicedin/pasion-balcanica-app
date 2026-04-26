@@ -96,6 +96,7 @@ export async function sendLocalizedPush({
         android: {
           priority: "high",
           notification: {
+            icon: "ic_launcher",
             // Default channel — Flutter's FCM plugin auto-creates
             // "Miscellaneous" if we don't specify. Good enough for now.
             sound: "default",

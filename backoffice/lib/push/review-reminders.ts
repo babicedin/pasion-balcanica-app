@@ -9,16 +9,51 @@ import {
  * Copy of the 48h "leave a review" push, kept here so both the cron job
  * and the admin-on-demand trigger render the exact same message.
  */
-export const REVIEW_REMINDER = {
-  title: {
-    en: "How was your walk?",
-    es: "¿Cómo fue tu caminata?",
-  },
-  body: {
-    en: "30 seconds to leave a Google review — it helps other travelers find Pasión Balcánica. ⭐",
-    es: "30 segundos para dejar una reseña en Google — ayuda a otros viajeros a encontrar Pasión Balcánica. ⭐",
-  },
+export const DEFAULT_REVIEW_REMINDER = {
+  title: "How was your walk?",
+  body: "30 seconds to leave a Google review — it helps other travelers find Pasión Balcánica. ⭐",
 } as const;
+
+export type ReviewReminderTemplate = {
+  title: string;
+  body: string;
+};
+
+export async function getReviewReminderTemplate(): Promise<ReviewReminderTemplate> {
+  const admin = createSupabaseAdminClient();
+  const { data, error } = await admin
+    .from("notification_templates")
+    .select("title, body")
+    .eq("key", "review_reminder_48h")
+    .maybeSingle();
+
+  if (error || !data) {
+    return {
+      title: DEFAULT_REVIEW_REMINDER.title,
+      body: DEFAULT_REVIEW_REMINDER.body,
+    };
+  }
+
+  return {
+    title: data.title || DEFAULT_REVIEW_REMINDER.title,
+    body: data.body || DEFAULT_REVIEW_REMINDER.body,
+  };
+}
+
+export async function upsertReviewReminderTemplate(input: ReviewReminderTemplate) {
+  const admin = createSupabaseAdminClient();
+  const { error } = await admin.from("notification_templates").upsert(
+    {
+      key: "review_reminder_48h",
+      title: input.title,
+      body: input.body,
+    },
+    { onConflict: "key" }
+  );
+  if (error) {
+    throw new Error(`Failed to save reminder template: ${error.message}`);
+  }
+}
 
 export type ReminderResult = {
   ok: boolean;
@@ -41,7 +76,9 @@ export type ReminderResult = {
  * via `postSendError` so the caller can surface them without losing the
  * fact that pushes did go out.
  */
-export async function dispatchReviewReminders(): Promise<ReminderResult> {
+export async function dispatchReviewReminders(
+  templateOverride?: ReviewReminderTemplate
+): Promise<ReminderResult> {
   const admin = createSupabaseAdminClient();
   const now = new Date();
   const upper = new Date(now.getTime() - 47 * 60 * 60 * 1000).toISOString();
@@ -63,10 +100,11 @@ export async function dispatchReviewReminders(): Promise<ReminderResult> {
     return { ok: true, eligible: 0, sent: 0, failed: 0, pruned: 0 };
   }
 
+  const template = templateOverride ?? (await getReviewReminderTemplate());
   const sendResult = await sendLocalizedPush({
     devices,
-    title: REVIEW_REMINDER.title,
-    body: REVIEW_REMINDER.body,
+    title: { en: template.title, es: template.title },
+    body: { en: template.body, es: template.body },
     data: { tab: "review" },
   });
 
@@ -98,10 +136,10 @@ export async function dispatchReviewReminders(): Promise<ReminderResult> {
   }
 
   const { error: logError } = await admin.from("notifications").insert({
-    title_en: REVIEW_REMINDER.title.en,
-    title_es: REVIEW_REMINDER.title.es,
-    body_en: REVIEW_REMINDER.body.en,
-    body_es: REVIEW_REMINDER.body.es,
+    title_en: template.title,
+    title_es: template.title,
+    body_en: template.body,
+    body_es: template.body,
     kind: "review_reminder",
     target_count: devices.length,
     success_count: sendResult.success,

@@ -13,10 +13,22 @@ import { useState } from "react";
  * gives the admin a manual "Run now" button for ad-hoc dispatch (useful
  * when verifying the pipeline or recovering from a missed cron run).
  */
-export function ReviewReminderCard({ eligible }: { eligible: number }) {
+export function ReviewReminderCard({
+  eligible,
+  initialTitle,
+  initialBody,
+}: {
+  eligible: number;
+  initialTitle: string;
+  initialBody: string;
+}) {
   const router = useRouter();
   const [running, setRunning] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [templateSaved, setTemplateSaved] = useState(false);
+  const [title, setTitle] = useState(initialTitle);
+  const [body, setBody] = useState(initialBody);
   const [result, setResult] = useState<{
     eligible: number;
     sent: number;
@@ -24,7 +36,43 @@ export function ReviewReminderCard({ eligible }: { eligible: number }) {
     pruned: number;
   } | null>(null);
 
+  async function saveTemplate() {
+    const trimmedTitle = title.trim();
+    const trimmedBody = body.trim();
+    if (!trimmedTitle || !trimmedBody) {
+      setError("Auto reminder title and body are required.");
+      return;
+    }
+
+    setSaving(true);
+    setError(null);
+    setTemplateSaved(false);
+
+    const res = await fetch("/api/notifications/review-template", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ title: trimmedTitle, body: trimmedBody }),
+    });
+
+    setSaving(false);
+    if (!res.ok) {
+      const detail = await res.json().catch(() => ({}));
+      setError((detail as { error?: string }).error ?? `HTTP ${res.status}`);
+      return;
+    }
+
+    setTemplateSaved(true);
+    router.refresh();
+  }
+
   async function runNow() {
+    const trimmedTitle = title.trim();
+    const trimmedBody = body.trim();
+    if (!trimmedTitle || !trimmedBody) {
+      setError("Auto reminder title and body are required.");
+      return;
+    }
+
     if (eligible === 0) {
       if (
         !confirm(
@@ -47,6 +95,8 @@ export function ReviewReminderCard({ eligible }: { eligible: number }) {
 
     const res = await fetch("/api/notifications/run-reminders", {
       method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ title: trimmedTitle, body: trimmedBody }),
     });
     setRunning(false);
 
@@ -77,10 +127,59 @@ export function ReviewReminderCard({ eligible }: { eligible: number }) {
             Auto review reminder
           </h2>
           <p className="text-sm text-muted">
-            Every device that installed the app gets one localized push
-            48 hours later, asking for a Google review. The mobile app
-            deep-links the tap straight into the Review tab.
+            Every active device gets one push 48 hours after install, asking
+            for a Google review. Edit the message below, save it, then use
+            Run now to test or manually trigger delivery.
           </p>
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        <label className="block space-y-1">
+          <span className="text-xs uppercase tracking-wider text-neutral-500 font-semibold">
+            48h auto reminder title
+          </span>
+          <input
+            value={title}
+            onChange={(event) => setTitle(event.target.value)}
+            className="input"
+            placeholder="How was your walk?"
+            maxLength={80}
+          />
+        </label>
+
+        <label className="block space-y-1">
+          <span className="text-xs uppercase tracking-wider text-neutral-500 font-semibold">
+            48h auto reminder body
+          </span>
+          <textarea
+            value={body}
+            onChange={(event) => setBody(event.target.value)}
+            className="textarea min-h-[110px]"
+            placeholder="30 seconds to leave a Google review..."
+            maxLength={350}
+          />
+        </label>
+
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={saveTemplate}
+            disabled={saving}
+            className="btn-secondary"
+          >
+            {saving ? (
+              <>
+                <Loader2 size={14} className="animate-spin" />
+                Saving...
+              </>
+            ) : (
+              "Save auto reminder message"
+            )}
+          </button>
+          {templateSaved && (
+            <span className="text-xs text-green-700">Saved.</span>
+          )}
         </div>
       </div>
 
@@ -145,7 +244,7 @@ export function ReviewReminderCard({ eligible }: { eligible: number }) {
           )}
         </button>
         <span className="text-xs text-muted">
-          Use to test the pipeline or recover from a missed cron run.
+          Immediate test: sends the current auto reminder text now.
         </span>
       </div>
     </div>

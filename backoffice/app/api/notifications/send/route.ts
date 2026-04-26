@@ -30,10 +30,8 @@ async function requireAdmin() {
 }
 
 type SendBody = {
-  title_en?: string;
-  title_es?: string;
-  body_en?: string;
-  body_es?: string;
+  title?: string;
+  body?: string;
 };
 
 export async function POST(request: NextRequest) {
@@ -49,14 +47,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
   }
 
-  const titleEn = payload.title_en?.trim() ?? "";
-  const titleEs = payload.title_es?.trim() ?? "";
-  const bodyEn = payload.body_en?.trim() ?? "";
-  const bodyEs = payload.body_es?.trim() ?? "";
+  const title = payload.title?.trim() ?? "";
+  const body = payload.body?.trim() ?? "";
 
-  if (!titleEn || !titleEs || !bodyEn || !bodyEs) {
+  if (!title || !body) {
     return NextResponse.json(
-      { error: "Title and body are required in both English and Spanish." },
+      { error: "Title and body are required." },
       { status: 400 }
     );
   }
@@ -65,7 +61,11 @@ export async function POST(request: NextRequest) {
 
   const { data: tokens, error: tokensError } = await admin
     .from("device_tokens")
-    .select("id, token, locale");
+    .select("id, token, locale")
+    .gte(
+      "last_seen_at",
+      new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+    );
 
   if (tokensError) {
     return NextResponse.json({ error: tokensError.message }, { status: 500 });
@@ -76,8 +76,8 @@ export async function POST(request: NextRequest) {
   try {
     result = await sendLocalizedPush({
       devices,
-      title: { en: titleEn, es: titleEs },
-      body: { en: bodyEn, es: bodyEs },
+      title: { en: title, es: title },
+      body: { en: body, es: body },
     });
   } catch (error) {
     const message =
@@ -105,10 +105,10 @@ export async function POST(request: NextRequest) {
   }
 
   const { error: insertError } = await admin.from("notifications").insert({
-    title_en: titleEn,
-    title_es: titleEs,
-    body_en: bodyEn,
-    body_es: bodyEs,
+    title_en: title,
+    title_es: title,
+    body_en: body,
+    body_es: body,
     kind: "broadcast",
     target_count: devices.length,
     success_count: result.success,

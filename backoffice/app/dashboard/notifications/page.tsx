@@ -1,15 +1,24 @@
 import { PageHeader } from "@/components/page-header";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { countReminderCandidates } from "@/lib/push/review-reminders";
+import {
+  countReminderCandidates,
+  getReviewReminderTemplate,
+} from "@/lib/push/review-reminders";
 import { ReviewReminderCard } from "./review-reminder-card";
 import { NotificationsComposer, type NotificationRow } from "./composer";
 
 export default async function NotificationsPage() {
   const supabase = createSupabaseServerClient();
 
-  const [{ count: deviceCount }, { data: history }, reminderCandidates] =
+  const [activeDevicesResult, { data: history }, reminderCandidates, template] =
     await Promise.all([
-      supabase.from("device_tokens").select("id", { count: "exact", head: true }),
+      supabase
+        .from("device_tokens")
+        .select("id", { count: "exact", head: true })
+        .gte(
+          "last_seen_at",
+          new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+        ),
       supabase
         .from("notifications")
         .select(
@@ -18,6 +27,7 @@ export default async function NotificationsPage() {
         .order("sent_at", { ascending: false })
         .limit(20),
       countReminderCandidates(),
+      getReviewReminderTemplate(),
     ]);
 
   return (
@@ -25,13 +35,17 @@ export default async function NotificationsPage() {
       <PageHeader
         eyebrow="Engagement"
         title="Push notifications"
-        description="Send a broadcast to every installed device, or trigger the 48h review reminder ahead of its daily run. The mobile app picks the EN or ES variant per user."
+        description="Edit the automatic 48h review reminder, or send an immediate one-off notification to active devices."
       />
 
-      <ReviewReminderCard eligible={reminderCandidates} />
+      <ReviewReminderCard
+        eligible={reminderCandidates}
+        initialTitle={template.title}
+        initialBody={template.body}
+      />
 
       <NotificationsComposer
-        deviceCount={deviceCount ?? 0}
+        deviceCount={activeDevicesResult.count ?? 0}
         history={(history ?? []) as NotificationRow[]}
       />
     </div>

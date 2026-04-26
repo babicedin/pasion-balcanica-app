@@ -28,13 +28,35 @@ async function requireAdmin() {
   return Boolean(data?.is_admin);
 }
 
-export async function POST(_request: NextRequest) {
+type RunReminderBody = {
+  title?: string;
+  body?: string;
+};
+
+export async function POST(request: NextRequest) {
   if (!(await requireAdmin())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
-    const result = await dispatchReviewReminders();
+    let payload: RunReminderBody = {};
+    try {
+      payload = (await request.json()) as RunReminderBody;
+    } catch {
+      // Optional body; empty is fine and falls back to saved template.
+    }
+
+    const title = payload.title?.trim();
+    const body = payload.body?.trim();
+    const template =
+      title && body
+        ? {
+            title,
+            body,
+          }
+        : undefined;
+
+    const result = await dispatchReviewReminders(template);
     if (result.postSendError) {
       return NextResponse.json(
         { error: result.postSendError, details: result },
