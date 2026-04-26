@@ -96,7 +96,8 @@ export async function sendLocalizedPush({
         android: {
           priority: "high",
           notification: {
-            icon: "ic_launcher",
+            // Android notification small icon must be a solid white glyph.
+            icon: "ic_stat_pasion",
             // Default channel — Flutter's FCM plugin auto-creates
             // "Miscellaneous" if we don't specify. Good enough for now.
             sound: "default",
