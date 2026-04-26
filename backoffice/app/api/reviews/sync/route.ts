@@ -25,6 +25,9 @@ async function isSignedInAdmin() {
 }
 
 function hasSyncSecret(request: NextRequest) {
+  // Vercel scheduled cron invocations include this header.
+  if (request.headers.get("x-vercel-cron")) return true;
+
   const secret = process.env.REVIEWS_SYNC_SECRET;
   if (!secret) return false;
   const auth = request.headers.get("authorization") ?? "";
