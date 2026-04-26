@@ -69,6 +69,32 @@ class _HomeShellState extends ConsumerState<HomeShell> {
       );
     });
 
+    ref.listen<({String title, String body})?>(pendingPushTextProvider, (
+      _,
+      next,
+    ) {
+      if (next == null || !mounted) return;
+      Future.microtask(() {
+        if (!mounted) return;
+        showDialog<void>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(next.title.isEmpty ? 'Notification' : next.title),
+            content: Text(next.body.isEmpty ? '(No message body)' : next.body),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      });
+      Future.microtask(
+        () => ref.read(pendingPushTextProvider.notifier).state = null,
+      );
+    });
+
     return Scaffold(
       backgroundColor: pb.bg,
       body: Stack(

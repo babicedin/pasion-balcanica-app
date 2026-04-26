@@ -78,6 +78,10 @@ export async function POST(request: NextRequest) {
       devices,
       title: { en: title, es: title },
       body: { en: body, es: body },
+      data: {
+        kind: "broadcast",
+        in_app_display: "1",
+      },
     });
   } catch (error) {
     const message =

@@ -13,6 +13,8 @@ export const DEFAULT_REVIEW_REMINDER = {
   title: "How was your walk?",
   body: "30 seconds to leave a Google review — it helps other travelers find Pasión Balcánica. ⭐",
 } as const;
+const GOOGLE_REVIEW_URL =
+  "https://search.google.com/local/writereview?placeid=ChIJNWlh6AbJWEcRII0t4fVcfrg";
 
 export type ReviewReminderTemplate = {
   title: string;
@@ -101,11 +103,17 @@ export async function dispatchReviewReminders(
   }
 
   const template = templateOverride ?? (await getReviewReminderTemplate());
+  const logoUrl = process.env.PUSH_NOTIFICATION_IMAGE_URL?.trim();
   const sendResult = await sendLocalizedPush({
     devices,
     title: { en: template.title, es: template.title },
     body: { en: template.body, es: template.body },
-    data: { tab: "review" },
+    data: {
+      tab: "review",
+      kind: "review_reminder",
+      url: GOOGLE_REVIEW_URL,
+    },
+    imageUrl: logoUrl || undefined,
   });
 
   let pruned = 0;

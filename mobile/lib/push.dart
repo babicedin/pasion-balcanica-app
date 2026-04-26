@@ -6,12 +6,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'supabase_client.dart';
+import 'util/launchers.dart';
 
 /// One-shot intent surfaced when a notification taps in. The HomeShell
 /// listens to this and switches tabs accordingly. We model it as a single
 /// optional value rather than a stream so we don't over-engineer for the
 /// only deep-link target we actually have today (Review).
 final pendingTabRequestProvider = StateProvider<int?>((_) => null);
+final pendingPushTextProvider =
+    StateProvider<({String title, String body})?>((_) => null);
 
 /// Background isolate handler. Must be a top-level (or static) function so
 /// Flutter can register its entry point — capturing instance state would
@@ -111,6 +114,28 @@ class PushService {
 
   void _route(WidgetRef ref, RemoteMessage? message, {required String source}) {
     if (message == null) return;
+
+    final url = (message.data['url'] ?? '').trim();
+    if (url.isNotEmpty) {
+      // Some pushes are meant to open external destinations directly
+      // after the tap (e.g. Google review reminder link).
+      Launchers.open(url);
+    }
+
+    final inAppDisplay = message.data['in_app_display'] == '1';
+    if (inAppDisplay) {
+      final title =
+          (message.notification?.title ?? message.data['title'] ?? '').trim();
+      final body = (message.notification?.body ?? message.data['body'] ?? '')
+          .trim();
+      if (title.isNotEmpty || body.isNotEmpty) {
+        ref.read(pendingPushTextProvider.notifier).state = (
+          title: title,
+          body: body,
+        );
+      }
+    }
+
     final tab = message.data['tab'];
     if (tab == null) return;
 

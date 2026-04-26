@@ -57,11 +57,13 @@ export async function sendLocalizedPush({
   title,
   body,
   data,
+  imageUrl,
 }: {
   devices: DeviceTokenRow[];
   title: Localized;
   body: Localized;
   data?: Record<string, string>;
+  imageUrl?: string;
 }) {
   if (devices.length === 0) {
     return { success: 0, failure: 0, invalidTokens: [] as string[] };
@@ -90,19 +92,35 @@ export async function sendLocalizedPush({
         notification: {
           title: title[locale],
           body: body[locale],
+          ...(imageUrl ? { imageUrl } : {}),
         },
         data: data ?? {},
         tokens: slice.map((d) => d.token),
         android: {
           priority: "high",
           notification: {
-            // Android notification small icon must be a solid white glyph.
+            // Android notification small icon should be a white glyph.
             icon: "ic_stat_pasion",
+            ...(imageUrl ? { imageUrl } : {}),
             // Default channel — Flutter's FCM plugin auto-creates
             // "Miscellaneous" if we don't specify. Good enough for now.
             sound: "default",
           },
         },
+        apns: imageUrl
+          ? {
+              fcmOptions: {
+                imageUrl,
+              },
+            }
+          : undefined,
+        webpush: imageUrl
+          ? {
+              notification: {
+                image: imageUrl,
+              },
+            }
+          : undefined,
       };
 
       const result = await messaging.sendEachForMulticast(message);
