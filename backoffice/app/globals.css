@@ -103,6 +103,12 @@ body {
            focus:outline-none focus:border-brand-purple/40 focus:ring-4 focus:ring-brand-purple/15
            transition-all duration-200 ease-apple-out;
   }
+  .textarea {
+    @apply w-full px-3.5 py-2.5 rounded-xl bg-white border border-line text-brand-ink
+           placeholder:text-neutral-400 leading-relaxed
+           focus:outline-none focus:border-brand-purple/40 focus:ring-4 focus:ring-brand-purple/15
+           transition-all duration-200 ease-apple-out resize-y;
+  }
   .label {
     @apply block text-xs font-medium text-neutral-600 mb-1.5;
   }
